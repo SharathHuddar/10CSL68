@@ -1,6 +1,7 @@
-#include <fstream.h>
-#include <string>
+#include <fstream>
+#include <string.h>
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 class student
 {
