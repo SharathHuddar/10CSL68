@@ -41,17 +41,17 @@ int main() {
         char rt_usn[20], st_rrn[20];
         char ind[2], name[20], sem[5];
         int i, flag, flag1;
-        file1.open("index.txt", ios::out|ios::app);
-        file2.open("record.txt", ios::out|ios::app);
-        if(!file1 || !file2) {
-                cout<<"File creation error!\n";
-                exit(0);
-        }
         for(;; ) {
                 cout<<"\n1.Add record \n2.Search record\n";
                 cin>>ch;
                 switch (ch) {
                 case 1: cout<<"Enter the details";
+                        file1.open("index.txt", ios::out|ios::app);
+                        file2.open("record.txt", ios::out|ios::app);
+                        if(!file1 || !file2) {
+                                cout<<"File creation error!\n";
+                                exit(0);
+                        }
                         for (i = 0; i <=no; i++) {
                                 cout<<"\nName : ";
                                 cin>>rec[i].name;
@@ -69,7 +69,8 @@ int main() {
                 case 2: cout<<"Enter RRN whose record is to be displayed : ";
                         cin>>st_rrn;
                         file1.open("index.txt", ios::in);
-                        if (!file1) {
+                        file2.open("record.txt", ios::in);
+                        if (!file1 || !file2) {
                                 cout<<"\nError!\n";
                                 exit(0);
                         }
