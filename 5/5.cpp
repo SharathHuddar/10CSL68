@@ -26,9 +26,25 @@ void student::get_data() {
         cout<<"\nSem : ";
         cin>>sem;
 }
+void sort_index() {
+        int t_addr;
+        string t_usn;
+        cout<<cnt<<"\n";
+        for (int i = 0; i < cnt; i++) {
+                for (int j = 0; j < cnt-1; j++) {
+                        if (usn_list[j]>usn_list[j+1]) {
+                                t_usn = usn_list[j];
+                                usn_list[j] = usn_list[j+1];
+                                usn_list[j+1] = t_usn;
+                                t_addr = addr_list[j];
+                                addr_list[j] = addr_list[j+1];
+                                addr_list[j+1] = t_addr;
+                        }
+                }
+        }
+}
 
 void create_index() {
-        void sort_index();
         int pos;
         string buf, urn;
         fstream fp("inp.txt", ios::in);
@@ -55,23 +71,6 @@ void create_index() {
         }
 }
 
-void sort_index() {
-        int t_addr;
-        string t_usn;
-        cout<<cnt<<"\n";
-        for (int i = 0; i < cnt; i++) {
-                for (int j = 0; j < cnt-1; j++) {
-                        if (usn_list[j]>usn_list[j+1]) {
-                                t_usn = usn_list[j];
-                                usn_list[j] = usn_list[j+1];
-                                usn_list[j+1] = t_usn;
-                                t_addr = addr_list[j];
-                                addr_list[j] = addr_list[j+1];
-                                addr_list[j+1] = t_addr;
-                        }
-                }
-        }
-}
 
 void student::add_rec(fstream &fp) {
         fp.seekp(0, ios::end);

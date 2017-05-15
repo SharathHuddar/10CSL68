@@ -35,9 +35,7 @@ int main(){
         int ch, key, flag;
         system("clear");
         while(1) {
-                cout<<"\n\nMain Menu\n---------------\n1.To insert an
-element\n2.Search for an element\n3.Display the tree\n4.Exit\nEnter
-choice";
+                cout<<"\n\nMain Menu\n---------------\n1.To insert an element\n2.Search for an element\n3.Display the tree\n4.Exit\nEnter choice";
                 cin>>ch;
                 switch(ch) {
                 case 1: cout<<"Enter the integer to be inserted : ";

@@ -1,5 +1,3 @@
-// TODO : rewrite the whole thing
-
 #include <iostream>
 #include <string.h>
 #include <fstream>
@@ -7,91 +5,72 @@
 
 using namespace std;
 
-char st_no[5];
-
-int no;
-
-class record {
+class records {
 public:
-char usn[20];
-char name[20];
-char sem[2];
-} rec[20];
+void addRecord(string, string, string);
+void search(int);
+};
 
-void retrieve_details() {
-        fstream file2;
-        char name[20], usn[20], rrn[5], sem[5];
-        file2.open("record.txt", ios::in);
-        for (int i = 0; i < no; i++) {
-                file2.getline(rrn, 5, '|');
-                file2.getline(usn, 20, '|');
-                file2.getline(name, 20, '|');
-                file2.getline(sem, 5, '\n');
-                if (strcmp(rrn, st_no) == 0) {
-                        cout<<"\n\nStudent details are : ";
-                        cout<<"\n\nUSN : "<<usn<<"\nName : "<<name<<"\nSem : "<<sem<<"\n";
-                }
+void records::addRecord(string usn, string name, string sem) {
+        fstream fp;
+        fp.open("records.txt", ios::out|ios::app);
+        if (!fp) {
+                cout<<"File creation error!\n";
+                exit(0);
         }
-        file2.close();
+        fp<<usn<<"|"<<name<<"|"<<sem<<"\n";
+        fp.close();
+}
+
+void records::search(int rrn) {
+        char line[100];
+        int flag;
+        fstream fp;
+        char usn[25], name[25], sem[4];
+        fp.open("records.txt", ios::in);
+        fp.seekg(ios::beg);
+        for (int i = 0; i < rrn; i++) {
+          if (fp.peek() != EOF) {
+            flag=0;
+            fp.getline(line, 101,  '\n');
+          } else {
+            flag=1;
+          }
+        }
+        if (flag) {
+                cout<<"\nRecord not found\n";
+        } else {
+                cout<<"\nRecord found : \n";
+                strcpy(usn, strtok(line, "|"));
+                strcpy(name, strtok(NULL, "|"));
+                strcpy(sem, strtok(NULL, "\n"));
+                cout<<"\nUSN : "<<usn<<endl;
+                cout<<"\nName : "<<name<<endl;
+                cout<<"\nSem : "<<sem<<endl;
+        }
 }
 
 int main() {
-        fstream file1, file2;
-        int ch;
-        char rt_usn[20], st_rrn[20];
-        char ind[2], name[20], sem[5];
-        int i, flag, flag1;
-        for(;; ) {
-                cout<<"\n1.Add record \n2.Search record\n";
+        int ch, rrn;
+        string usn, name, sem;
+        records r;
+        do {
+                cout<<"\n1.Add a record\n2.Search for a record by RRN\nEnter your choice : ";
                 cin>>ch;
                 switch (ch) {
-                case 1: cout<<"Enter the details";
-                        file1.open("index.txt", ios::out|ios::app);
-                        file2.open("record.txt", ios::out|ios::app);
-                        if(!file1 || !file2) {
-                                cout<<"File creation error!\n";
-                                exit(0);
-                        }
-                        for (i = 0; i <=no; i++) {
-                                cout<<"\nName : ";
-                                cin>>rec[i].name;
-                                cout<<"USN : ";
-                                cin>>rec[i].usn;
-                                cout<<"Sem : ";
-                                cin>>rec[i].sem;
-                                file1<<rec[i].usn<<"|"<<i<<"\n";
-                                file2<<i<<"|"<<rec[i].usn<<"|"<<rec[i].name<<"|"<<rec[i].sem<<"\n";
-                        }
-                        file1.close();
-                        file2.close();
+                case 1: cout<<"Enter USN : ";
+                        cin>>usn;
+                        cout<<"Enter Name : ";
+                        cin>>name;
+                        cout<<"Enter Sem : ";
+                        cin>>sem;
+                        r.addRecord(usn, name, sem);
                         break;
-
-                case 2: cout<<"Enter RRN whose record is to be displayed : ";
-                        cin>>st_rrn;
-                        file1.open("index.txt", ios::in);
-                        file2.open("record.txt", ios::in);
-                        if (!file1 || !file2) {
-                                cout<<"\nError!\n";
-                                exit(0);
-                        }
-                        flag1=0;
-                        for (i = 0; i < no; i++) {
-                                file1.getline(rt_usn, 20, '|');
-                                file2.getline(st_no, 4, '\n');
-                                if (strcmp(st_rrn, st_no) == 0) {
-                                        retrieve_details();
-                                        flag1 = 1;
-                                }
-                        }
-                        if (!flag1) {
-                                cout<<"Record search failed!\n";
-                        }
-                        file1.close();
-                        break;
-
-                default: cout<<"Invalid choice";
-                        exit(0);
-                        break;
+                case 2: cout<<"Enter RRN to search record : ";
+                        cin>>rrn;
+                        r.search(rrn);
                 }
-        }
+        } while(ch==1 || ch==2);
+        exit(0);
+        return 0;
 }
