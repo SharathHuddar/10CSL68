@@ -10,7 +10,7 @@
 - 6 -> To be fixed
 - 7 -> Working
 - 8 -> Working
-- 9 -> Working (Logic of B trees to be verified)
-- 10 -> Working (Logic of B+ trees to be verified)
+- 9 -> Working
+- 10 -> Working
 - 11 -> Working
 - 12 -> Record delete functionality is not working
