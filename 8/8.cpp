@@ -1,3 +1,9 @@
+/*
+   Write a C++ program to read k Lists of names and merge them using
+   kway merge algorithm with k = 8.
+ */
+
+
 #include <iostream>
 #include <string>
 #include <fstream>

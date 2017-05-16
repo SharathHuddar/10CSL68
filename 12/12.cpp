@@ -1,3 +1,8 @@
+/*
+   Write a C++ program to reclaim the free space resulting from the
+   deletion of records using linked lists.
+ */
+
 #include <iostream>
 #include <string>
 #include <fstream>

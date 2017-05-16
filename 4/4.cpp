@@ -1,3 +1,10 @@
+/*
+   Write a c++ program to write student objects with variable-length records
+   using any suitable record structure and to read from this file a
+   student record using RRN.
+ */
+
+
 #include <iostream>
 #include <string.h>
 #include <fstream>

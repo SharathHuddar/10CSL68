@@ -1,3 +1,10 @@
+/*
+   Write a C++ program to implement simple index on primary key
+   for a file of student objects.
+   Implement add(),search(),delete() using the index.
+ */
+
+
 // TODO : rewrite the whole thing
 #include <iostream>
 #include <string.h>

@@ -1,3 +1,7 @@
+/*
+   Write a C++ program to read and write and student objects with fixed-length records and the fields
+   delimited by “|”.implement pack(),unpack(),modify() and search() methods.
+ */
 #include <fstream>
 #include <string.h>
 #include <iostream>

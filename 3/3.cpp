@@ -1,3 +1,8 @@
+/*
+   Write a C++ program to read and write and student objects with variable-length records using any
+   suitable record structure. Implement pack(),unpack(),modify() and search() methods
+ */
+
 #include <fstream>
 #include <string.h>
 #include <iostream>

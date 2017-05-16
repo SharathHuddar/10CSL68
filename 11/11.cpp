@@ -1,3 +1,9 @@
+/*
+   Write a C++ program to store and retrieve student data from file using
+   hashing. Use any collision resolution technique
+ */
+
+
 #include <iostream>
 #include <fstream>
 #include <string.h>

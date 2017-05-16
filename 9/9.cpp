@@ -1,3 +1,8 @@
+/*
+   Write a C++ program to implement B-Tree for a given set of integers and
+   its operations insert ( ) and search ( ). Display the tree.
+ */
+
 #define MAX 4
 #define MIN 2
 #include <iostream>
