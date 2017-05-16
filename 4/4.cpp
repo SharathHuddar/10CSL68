@@ -30,12 +30,12 @@ void records::search(int rrn) {
         fp.open("records.txt", ios::in);
         fp.seekg(ios::beg);
         for (int i = 0; i < rrn; i++) {
-          if (fp.peek() != EOF) {
-            flag=0;
-            fp.getline(line, 101,  '\n');
-          } else {
-            flag=1;
-          }
+                if (fp.peek() != EOF) {
+                        flag=0;
+                        fp.getline(line, 101,  '\n');
+                } else {
+                        flag=1;
+                }
         }
         if (flag) {
                 cout<<"\nRecord not found\n";
