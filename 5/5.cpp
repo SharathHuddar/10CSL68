@@ -4,170 +4,182 @@
    Implement add(),search(),delete() using the index.
  */
 
+ #include <iostream>
+ #include <string>
+ #include <fstream>
+ #include <stdlib.h>
 
-// TODO : rewrite the whole thing
-#include <iostream>
-#include <string.h>
-#include <fstream>
-#include <stdlib.h>
+ using namespace std;
 
-using namespace std;
+ class student {
+ public:
+   string usn, name, sem;
+   void enter_data();
+   void pack();
+ }s1;
 
-int n;
-string usn_list[100];
-int addr_list[100];
-int cnt;
+ struct index {
+   string usn;
+   int addr;
+ }il[100], temp;
 
-class student {
-public:
-string usn, name, sem;
-void add_rec(fstream &);
-void get_data();
-};
+ int cnt;
+ fstream fp;
 
-void student::get_data() {
-        cout<<"\nUSN : ";
-        cin>>usn;
-        cout<<"\nName : ";
-        cin>>name;
-        cout<<"\nSem : ";
-        cin>>sem;
-}
-void sort_index() {
-        int t_addr;
-        string t_usn;
-        cout<<cnt<<"\n";
-        for (int i = 0; i < cnt; i++) {
-                for (int j = 0; j < cnt-1; j++) {
-                        if (usn_list[j]>usn_list[j+1]) {
-                                t_usn = usn_list[j];
-                                usn_list[j] = usn_list[j+1];
-                                usn_list[j+1] = t_usn;
-                                t_addr = addr_list[j];
-                                addr_list[j] = addr_list[j+1];
-                                addr_list[j+1] = t_addr;
-                        }
-                }
-        }
-}
+ void create_index();
+ void sort_index();
+ void search();
+ int bin_srch(string);
+ void del();
+ void error(int);
 
-void create_index() {
-        int pos;
-        string buf, urn;
-        fstream fp("inp.txt", ios::in);
-        cnt=-1;
-        while (fp) {
-                pos=fp.tellg();
-                buf.erase();
-                getline(fp, buf);
-                int i=0;
-                if (buf[i]=='*') {
-                        continue;
-                }
-                urn.erase();
-                while (buf[i]!='|') {
-                        urn+=buf[i++];
-                }
-                usn_list[++i] = urn;
-                addr_list[cnt] = pos;
-        }
-        fp.close();
-        sort_index();
-        for (int i = 0; i < cnt; i++) {
-                cout<<usn_list[i]<<"|"<<addr_list[i]<<"\n";
-        }
-}
+ int main(){
+   int choice;
+   system("clear");
+   fp.open("record5.txt", ios::out|ios::app);
+   fp.close();
+   create_index();
+   while (1) {
+     cout<<"1.To add record\n2.To search for a record\n3.To delete a record\n4.Exit \n\nEnter choice : ";
+     cin>>choice;
+     switch (choice) {
+       case 1: s1.enter_data();
+               fp.open("record5.txt", ios::out|ios::app);
+               if (!fp) {
+                 error(1);
+               }
+               s1.pack();
+               fp.close();
+               break;
+       case 2: search();
+               break;
+       case 3: del();
+               break;
+       default:exit(0);
+     }
+   }
+ }
 
+ void create_index(){
+   int pos,i;
+   string seg, usnbuf;
+   cnt = -1;
+   fp.open("record5.txt", ios::in);
+   if (!fp) {
+     error(1);
+   }
+   while (fp) {
+     usnbuf.erase();
+     pos = fp.tellg();
+     getline(fp, usnbuf, '|');
+     getline(fp, seg);
+     if (usnbuf[0] == '*' || usnbuf.length() == 0) {
+       continue;
+     }
+     cnt++;
+     il[cnt].usn = usnbuf;
+     il[cnt].addr = pos;
+   }
+   fp.close();
+   sort_index();
+ }
 
-void student::add_rec(fstream &fp) {
-        fp.seekp(0, ios::end);
-        fp<<usn<<"|"<<name<<"|"<<sem<<"\n";
-}
+ void sort_index(){
+   for (int i = 0; i <=cnt; i++) {
+     for (int j = i+1; j <= cnt; j++) {
+       if (il[i].usn>il[j].usn) {
+         temp.usn = il[i].usn;
+         temp.addr = il[i].addr;
+         il[i].usn = il[j].usn;
+         il[i].addr = il[j].addr;
+         il[j].usn = temp.usn;
+         il[j].addr = temp.addr;
+       }
+     }
+   }
+ }
 
-int search(string key) {
-        int pos=0, adr, l=0, h=cnt, mid, flag=0;
-        string buffer;
-        fstream fp("inp.txt", ios::in);
-        while (l<=h) {
-                mid=(l+h)/2;
-                if (usn_list[mid]==key) {
-                        flag = 1;
-                        break;
-                }
-                if (usn_list[mid]>key) {
-                        h=mid-1;
-                }
-                if (usn_list[mid]<key) {
-                        l=mid+1;
-                }
-        }
-        if (flag) {
-                adr=addr_list[mid];
-                fp.seekp(adr, ios::beg);
-                getline(fp, buffer);
-                cout<<"\nFound the rec"<<buffer;
-                return mid;
-        } else {
-                cout<<"\nNot found";
-                return 0;
-        }
-        fp.close();
-}
+ void student::enter_data(){
+   cout<<"\nEnter usn : ";
+   cin>>usn;
+   cout<<"\nEnter name : ";
+   cin>>name;
+   cout<<"\nEnter sem : ";
+   cin>>sem;
+ }
 
-void del_rec(string key) {
-        int pos=0, adr;
-        fstream fp;
-        pos=search(key);
-        adr=addr_list[pos];
-        if (pos) {
-                fp.open("inp.txt", ios::out|ios::in);
-                fp.seekp(adr, ios::beg);
-                fp.put('*');
-                cout<<"\nRecord deleted ";
-                fp.close();
-                for (int i = pos; i < cnt; i++) {
-                        usn_list[i]=usn_list[i+1];
-                        addr_list[i]=addr_list[i+1];
-                }
-                cnt--;
-        } else {
-                cout<<"\nNot found";
-        }
-}
+ void student::pack(){
+   int pos=fp.tellg();
+   string buf = usn + "|" + name + "|" + sem + "|";
+   fp<<buf<<endl;
+   cnt++;
+   il[cnt].usn = usn;
+   il[cnt].addr = pos;
+   sort_index();
+ }
 
-int main() {
-        student s[100];
-        string key;
-        fstream fp;
-        int ch;
-        int search(string);
-        void create_index();
-        void del_rec(string);
-        for (;; ) {
-                cout<<"\nEnter your choice\n1.Add rec\n2.Show index\n3.Search\n4.Delete\n5.Exit\n";
-                cin>>ch;
-                switch (ch) {
-                case 1: fp.open("inp.txt", ios::out);
-                        cout<<"Enter how many records\n";
-                        cin>>n;
-                        for (int i = 0; i < n; i++) {
-                                s[i].get_data();
-                                s[i].add_rec(fp);
-                        }
-                        fp.close();
-                        break;
-                case 2: create_index();
-                        break;
-                case 3: cout<<"Enter key to be searched\n";
-                        cin>>key;
-                        search(key);
-                        break;
-                case 4: cout<<"Enter key of record to be deleted\n";
-                        cin>>key;
-                        del_rec(key);
-                        break;
-                case 5: return (0);
-                }
-        }
-        return 0;
-}
+ int bin_srch(string usn_srch){
+   int l=0, h=cnt, mid;
+   while (l<=h) {
+     mid = (l+h)/2;
+     if (il[mid].usn == usn_srch) {
+       return mid;
+     }
+     if (il[mid].usn<usn_srch) {
+       l=mid+1;
+     }
+     if (il[mid].usn>usn_srch) {
+       h=mid-1;
+     }
+   }
+   return -1;
+ }
+
+ void search(){
+   string usn_srch, buf;
+   cout<<"Enter the USN of the student to be found : ";
+   cin>>usn_srch;
+   int pos = bin_srch(usn_srch);
+   if (pos == -1) {
+     cout<<"Record not found\n";
+     return;
+   }
+   cout<<"Record found\n";
+   cout<<"Usn|Name|Sem"<<endl;
+   fp.open("record5.txt",ios::in);
+   if (!fp) {
+     error(1);
+   }
+   fp.seekg(il[pos].addr, ios::beg);
+   getline(fp, buf);
+   fp.close();
+   cout<<buf<<endl;
+ }
+
+ void del(){
+   string usn_srch;
+   cout<<"Enter the USN of the student to be deleted : ";
+   cin>>usn_srch;
+   int pos = bin_srch(usn_srch);
+   if (pos == -1) {
+     cout<<"\nRecord not found";
+     return;
+   }
+   cout<<"\nRecord found and deleted\n";
+   fp.open("record5.txt", ios::out|ios::in);
+   fp.seekp(il[pos].addr, ios::beg);
+   fp.put('*');
+   fp.close();
+   for (int i = 0; i < cnt; i++) {
+     il[i].usn = il[i+1].usn;
+     il[i].addr = il[i+1].addr;
+   }
+   cnt--;
+ }
+
+ void error(int error_type){
+   switch (error_type) {
+     case 1: cout<<"\nFATAL ERROR! : Unable to open the record file\n";
+             exit(0);
+   }
+ }
