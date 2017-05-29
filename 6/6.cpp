@@ -5,209 +5,225 @@
  */
 
 
-#include <string.h>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
+ #include <iostream>
+ #include <string>
+ #include <fstream>
+ #include <stdlib.h>
 
-using namespace std;
+ using namespace std;
 
-class record {
-public:
-char sem[5], usn[20], name[20];
-} rec[20], found[20];
+ class student {
+ public:
+ string usn, name, sem;
+ void pack();
+ void enter_data();
+ } s1;
 
-char st_no[5], rt_name[20];
-int no;
+ struct sec_index {
+         string usn, name;
+         int addr;
+ } i2[100], found[20];
+ int cnt, find_cnt;
 
-void sort(){
-		int i,j;
-		record temp;
-		for(i=0; i<no-1; i++)
-				for(j=0; j<no-1; j++)
-						if(strcmp(rec[j].name, rec[j+1].name)>0) {
-								temp=rec[j];
-								rec[j]=rec[j+1];
-								rec[j+1]=temp;
-						}
-}
+ fstream fp;
+ int indexnums[20];
 
-void create_index_file(){
-		ofstream index, index1;
-		int i;
-		index.open("secindex.txt", ios::out);
-		index1.open("record.txt", ios::out);
-		for(i=0; i<no; i++) {
-				if(i==no-1) {
-						index<<rec[i].name<<"|"<<rec[i].usn<<"|"<<i+1;
-						index1<<i+1<<"|"<<rec[i].usn<<"|"<<rec[i].name<<"|"<<rec[i].sem;
-				} else {
-						index<<rec[i].name<<"|"<<rec[i].usn<<"|"<<i+1<<endl;
-						index1<<i+1<<"|"<<rec[i].usn<<"|"<<rec[i].name<<"|"<<rec[i].sem<<endl;
-				}
-		}
-		index.close();
-		index1.close();
-}
+ void create_index();
+ void sort_index();
+ void search();
+ void lin_srch(string);
+ void del();
+ void error(int);
 
-void retrieve_record(char *index){
-		cout<<"Inside retrieve_record \n";
-		fstream f1;
-		int i;
-		char buff[80], *p;
-		f1.open("record.txt", ios::in);
-		while(!f1.eof()) {
-				f1.getline(buff, 80, '\n');
-				p = strtok(buff, "|");
-				cout<< strcmp(index, p);
-				if(strcmp(index, p)==0) {
-						cout<<"\n\nStudent details \n";
-						cout<<"\nUSN\tName\tAge\tSem\tBranch\n";
-						while(p!=NULL) {
-								p = strtok(NULL, "|");
-								if(p!=NULL)
-										cout<<p<<"\t";
-						}
-				}
-		}
-		f1.close();
-}
+ int main(){
+         int choice;
+         system("clear");
+         fp.open("record6.txt", ios::out|ios::app);
+         fp.close();
+         create_index();
+         while (1) {
+                 cout<<"\n1.Add record\n2.Search for a record\n3.Delete a record\n4.Exit\n\nEnter choice : ";
+                 cin>>choice;
+                 switch (choice) {
+                 case 1: s1.enter_data();
+                         fp.open("record6.txt", ios::out|ios::app);
+                         if (!fp) {
+                                 error(1);
+                         }
+                         s1.pack();
+                         fp.close();
+                         break;
+                 case 2: search();
+                         break;
+                 case 3: del();
+                         break;
+                 default: exit(0);
+                 }
+         }
+ }
 
-void delete_record(char *idx){
-		fstream f1;
-		int i;
-		char buff[80], *p, index[20][20];
-		f1.open("record.txt",ios::in);
-		i=0;
-		while(!f1.eof()) {
-				f1.getline(buff, 80, '\n');
-				p = strtok(buff, "|");
-				strcpy(index[i], p);
-				p = strtok(NULL,"|");
-				strcpy(rec[i].usn, p);
-				p = strtok(NULL, "|");
-				strcpy(rec[i].name, p);
-				p = strtok(NULL, "|");
-				strcpy(rec[i].sem, p);
-				i++;
-		}
-		no=i;
-		f1.close();
-		int k = -1;
-		for(i=0; i<no; i++) {
-				if(strcmp(index[i], idx)==0) {
-						k=i;
-						break;
-				}
-		}
-		if(k>-1) {
-				for(i=k; i<no-1; i++) {
-						rec[i]=rec[i+1];
-				}
-				no--;
-				sort();
-				create_index_file();
-				cout<<"\nData successfully deleted ";
-		} else
-				cout<<"\nInvalid name \n";
-}
+ void create_index(){
+         int pos, i;
+         string seg, usnbuf, namebuf;
+         cnt = -1;
+         fp.open("record6.txt", ios::in);
+         if (!fp) {
+                 error(1);
+         }
+         while(fp) {
+                 usnbuf.erase();
+                 namebuf.erase();
+                 pos = fp.tellg();
+                 getline(fp, usnbuf, '|');
+                 getline(fp, namebuf, '|');
+                 getline(fp, seg);
+                 if (usnbuf[0] == '*' || usnbuf.length() == 0 || namebuf.length() == 0) {
+                         continue;
+                 }
+                 cnt++;
+                 i2[cnt].usn = usnbuf;
+                 i2[cnt].name = namebuf;
+                 i2[cnt].addr = pos;
+         }
+         fp.close();
+         sort_index();
+ }
 
-void display_record(){
-		char buff[80], *p;
-		int flag = 1;
-		ifstream f1;
-		f1.open("record.txt", ios::in);
-		cout<<"\n\nStudent details \n";
-		cout<<"\nUSN\tName\tSem\n";
-		while(!f1.eof()) {
-				f1.getline(buff, 80, '\n');
-				p = strtok(buff, "|");
-				while(p!=NULL) {
-						flag=0;
-						p=strtok(NULL, "|");
-						if(p!=NULL)
-								cout<<p<<setw(15);
-				}
-				cout<<endl<<setw(0);
-		}
-		if(flag==1)
-				cout<<"\nNo record found\n";
-		f1.close();
-}
+ void sort_index(){
+         struct sec_index temp;
+         for (int i = 0; i <=cnt; i++) {
+                 for (int j = i+1; j <= cnt; j++) {
+                         if (i2[i].name>i2[j].name) {
+                                 temp.usn = i2[i].usn;
+                                 temp.name = i2[i].name;
+                                 temp.addr = i2[i].addr;
 
-void retrieve_details(int ch){
-		int k=0, i;
-		char buff[80], *p;
-		ifstream f1;
-		char chusn[20], index[20][80];
-		f1.open("secindex.txt", ios::in);
-		while(!f1.eof()) {
-				f1.getline(buff, 80, '\n');
-				p = strtok(buff, "|");
-				if(strcmp(rt_name, p)==0) {
-						strcpy(found[k].name, p);
-						p = strtok(NULL, "|");
-						strcpy(found[k].usn, p);
-						p = strtok(NULL, "|");
-						strcpy(index[k], p);
-						k++;
-				}
-		}
-		if(k==1) {
-				if(ch==2)
-						retrieve_record(index[20]);
-				else
-						delete_record(index[0]);
-		} else if(k>1) {
-				cout<<"Please choose the candidate USN \n";
-				for(i=0; i<k; i++)
-						cout<<"Name="<<found[i].name<<"USN = "<<found[i].usn<<endl;
-				cin>>chusn;
-				for(i=0; i<k; i++) {
-						if(strcmp(chusn, found[i].usn)==0) {
-								if(ch==2)
-										retrieve_record(index[i]);
-								else
-										delete_record(index[i]);
-						}
-				}
-		} else
-				cout<<"Invalid Name\n";
-}
+                                 i2[i].usn=i2[j].usn;
+                                 i2[i].name = i2[j].name;
+                                 i2[i].addr = i2[j].addr;
 
-int main(){
-		int ch, flag=1;
-		while(flag) {
-				cout<<"\n1.Add new record \n2.Retrieve record\n3.Delete a record\n4.Display\n5.Exit\n";
-				cout<<"Enter the choice\t";
-				cin>>ch;
-				switch(ch) {
-				case 1: cout<<"Enter the number of records \n";
-						cin>>no;
-						for(int i=0; i<no; i++) {
-								cout<<"Enter the details of "<<i+1<<" student";
-								cout<<"\nUSN\t";
-								cin>>rec[i].usn;
-								cout<<"Name\t";
-								cin>>rec[i].name;
-								cout<<"Semester\t";
-								cin>>rec[i].sem;
-						}
-						sort();
-						create_index_file();
-						break;
-				case 2:
-				case 3: if(ch==2)
-								cout<<"Enter name to search \t";
-						else
-								cout<<"Enter the student name to delete\t";
-						cin>>rt_name;
-						retrieve_details(ch);
-						break;
-				case 4: display_record();
-						break;
-				default: flag=0;
-				}
-		}
-		return 0;
-}
+                                 i2[j].usn = temp.usn;
+                                 i2[j].name = temp.name;
+                                 i2[j].addr = temp.addr;
+                         }
+                 }
+         }
+ }
+
+ void student::enter_data(){
+         cout<<"\nEnter usn:";
+         cin>>usn;
+         cout<<"\nEnter name : ";
+         cin>>name;
+         cout<<"\nEnter sem : ";
+         cin>>sem;
+ }
+
+ void student::pack(){
+         int pos = fp.tellp();
+         string buf = usn + "|" + name + "|" + sem + "|";
+         fp<<buf<<endl;
+         cnt++;
+         i2[cnt].addr = pos;
+         i2[cnt].usn = usn;
+         i2[cnt].name = name;
+         sort_index();
+ }
+
+ void lin_srch(string name_srch){
+         find_cnt = 0;
+         int j=0;
+         for (int i = 0; i <= cnt; i++) {
+                 if (i2[i].name == name_srch) {
+                         indexnums[j++]=i;
+                         found[find_cnt].usn = i2[i].usn;
+                         found[find_cnt].name = i2[i].name;
+                         found[find_cnt].addr = i2[i].addr;
+                         find_cnt++;
+                 }
+         }
+ }
+
+ void search(){
+         string name_srch, buf;
+         int ch;
+         cout<<"\nEnter the name of the stident to be searched : ";
+         cin>>name_srch;
+         lin_srch(name_srch);
+         if (find_cnt == 0) {
+                 cout<<"\nRecord not found! \n";
+                 return;
+         }
+         if (find_cnt == 1) {
+                 cout<<"\n1 Record found\n";
+                 ch = 0;
+         }
+         if (find_cnt>1) {
+                 cout<<"\nMultiple records found!\n";
+                 for (int i = 0; i < find_cnt; i++) {
+                         cout<<i<<"Usn = "<<found[i].usn<<endl;
+                 }
+                 cout<<"\nEnter choice : ";
+                 cin>>ch;
+                 if (ch>find_cnt) {
+                         cout<<"Invalid range \n"; return;
+                 }
+         }
+         cout<<"\nUsn|Name|Sem"<<endl;
+         fp.open("record6.txt", ios::in);
+         if(!fp)
+                 error(1);
+         fp.seekg(found[ch].addr, ios::beg);
+         getline(fp, buf);
+         fp.close();
+         cout<<buf<<endl;
+ }
+
+ void del(){
+         string name_srch;
+         int ch;
+         cout<<"\nEnter the name of the student to be deleted : ";
+         cin>>name_srch;
+         lin_srch(name_srch);
+         if (find_cnt == 0) {
+                 cout<<"\nRecord not found!\n";
+                 return;
+         }
+         if (find_cnt == 1) {
+                 cout<<"\n1 Record found\n";
+                 ch = 0;
+         }
+         if (find_cnt > 1) {
+                 cout<<"\nMultiple records found!\n";
+                 for (int i = 0; i < find_cnt; i++) {
+                         cout<<i<<". "<<found[i].usn<<endl;
+                 }
+                 cout<<"\nEnter choice : ";
+                 cin>>ch;
+                 if (ch>find_cnt) {
+                         cout<<"Invalid range \n";
+                         return;
+                 }
+         }
+         cout<<"\nRecord deleted\n\n";
+         fp.open("record6.txt", ios::out|ios::in);
+         if (!fp) {
+                 error(1);
+         }
+         fp.seekp(found[ch].addr, ios::beg);
+         fp.put('*');
+         fp.close();
+         for (int i = indexnums[ch]; i < cnt; i++) {
+                 i2[i].usn = i2[i+1].usn;
+                 i2[i].name = i2[i+1].name;
+                 i2[i].addr = i2[i+1].addr;
+         }
+         cnt--;
+ }
+
+ void error(int error_type){
+   switch (error_type) {
+     case 1: cout<<"\nFATAL ERROR! : Unable to open the record file\n";
+             exit(0);
+   }
+ }

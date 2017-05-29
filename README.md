@@ -7,7 +7,7 @@
 - 3 -> Working
 - 4 -> Working
 - 5 -> Working
-- 6 -> To be fixed
+- 6 -> Working
 - 7 -> Working
 - 8 -> Working
 - 9 -> Working
