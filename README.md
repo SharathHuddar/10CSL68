@@ -13,4 +13,4 @@
 - 9 -> Working
 - 10 -> Working
 - 11 -> Working
-- 12 -> Record delete functionality is not working
+- 12 -> Working
